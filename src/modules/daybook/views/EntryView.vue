@@ -2,9 +2,9 @@
 <div class="entry-title d-flex justify-content-between p-2">
 
   <div>
-    <span class="text-success fs-3 fw-bold">11</span>
-    <span class="mx-1 fs-3">Diciembre</span>
-    <span class="mx-2 fs-4 fw-light">2022</span>
+    <span class="text-success fs-3 fw-bold">{{ day }}</span>
+    <span class="mx-1 fs-3">{{ month }}</span>
+    <span class="mx-2 fs-4 fw-light">{{ yearDay }}</span>
   </div>
 
   <div>
@@ -22,18 +22,19 @@
 
   <hr>
   <div class="d-flex flex-column px-3 h-75">
-    <textarea placeholder="¿Qué sucedió ahora"></textarea>
+    <textarea v-model="entry.text"  placeholder="¿Qué sucedió ahora"></textarea>
   </div>
   <Fab icon="fa-save"></Fab>
 
-  <img src="https://images.pexels.com/photos/2662116/pexels-photo-2662116.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" alt="entry-picture" class="img-thumbnail">
+  <img src="https://images.pexels.com/photos/2662116/pexels-photo-2662116.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+       alt="entry-picture" class="img-thumbnail">
 </template>
 
 <script>
-import {defineAsyncComponent} from 'vue';
-
+import { defineAsyncComponent } from 'vue';
 import { mapGetters } from 'vuex';
 
+import getDayMonthYear from '@/modules/daybook/helpers/getDayMonthYear';
 export default {
   name: "EntryView",
   props: {
@@ -45,13 +46,31 @@ export default {
   components: {
     Fab: defineAsyncComponent(() => import('../components/Fab.vue')),
   },
+  data() {
+    return {
+      entry: null
+    }
+  },
   computed: {
-    ...mapGetters('journal', ['getEntryById'])
+    ...mapGetters('journal', ['getEntryById']),
+    day() {
+      const { day } = getDayMonthYear( this.entry.date );
+      return day;
+    },
+    month() {
+      const { month } = getDayMonthYear( this.entry.date );
+      return month;
+    },
+    yearDay() {
+      const { yearDay } = getDayMonthYear( this.entry.date );
+      return yearDay;
+    },
   },
   methods: {
     loadEntry() {
       const entry = this.getEntryById(this.id);
-      console.log(entry);
+      if ( !entry )  this.$router.push({name: 'no-entry'});
+        this.entry = entry;
     }
   },
   created() {
