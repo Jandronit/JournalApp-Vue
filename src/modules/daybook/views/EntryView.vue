@@ -1,5 +1,8 @@
 <template>
-<div class="entry-title d-flex justify-content-between p-2">
+
+  <template v-if="entry">
+
+  <div class="entry-title d-flex justify-content-between p-2">
 
   <div>
     <span class="text-success fs-3 fw-bold">{{ day }}</span>
@@ -24,10 +27,14 @@
   <div class="d-flex flex-column px-3 h-75">
     <textarea v-model="entry.text"  placeholder="¿Qué sucedió ahora"></textarea>
   </div>
-  <Fab icon="fa-save"></Fab>
 
   <img src="https://images.pexels.com/photos/2662116/pexels-photo-2662116.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
        alt="entry-picture" class="img-thumbnail">
+
+  </template>
+
+  <Fab icon="fa-save"></Fab>
+
 </template>
 
 <script>
@@ -69,12 +76,17 @@ export default {
   methods: {
     loadEntry() {
       const entry = this.getEntryById(this.id);
-      if ( !entry )  this.$router.push({name: 'no-entry'});
+      if ( !entry ) return this.$router.push({name: 'no-entry'});
         this.entry = entry;
     }
   },
   created() {
     this.loadEntry();
+  },
+  watch: {
+    id() {
+        this.loadEntry();
+    }
   }
 }
 </script>
