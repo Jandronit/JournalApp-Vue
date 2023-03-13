@@ -39,12 +39,16 @@
     <textarea v-model="entry.text"  placeholder="¿Qué sucedió ahora"></textarea>
   </div>
 
-<!--  <img src="https://images.pexels.com/photos/2662116/pexels-photo-2662116.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"-->
-<!--       alt="entry-picture" class="img-thumbnail">-->
+  <img v-if="entry.picture && !localImage"
+       :src="entry.picture"
+       alt="entry-picture"
+       class="img-thumbnail">
+
     <img v-if="localImage"
          :src="localImage"
          alt="entry-picture"
          class="img-thumbnail">
+
   </template>
 
   <Fab icon="fa-save"
@@ -58,6 +62,8 @@ import { mapGetters, mapActions } from 'vuex';
 import Swal from 'sweetalert2';
 
 import getDayMonthYear from '@/modules/daybook/helpers/getDayMonthYear';
+import  uploadImage  from '@/modules/daybook/helpers/uploadImage';
+
 export default {
   name: "EntryView",
   props: {
@@ -95,6 +101,8 @@ export default {
     ...mapActions('journal', ['updateEntry', 'createEntry', 'deleteEntry']),
 
     loadEntry() {
+      this.localImage = null;
+      this.file = null;
       let entry;
       if ( this.id === 'new' ) {
         entry = {
@@ -116,6 +124,7 @@ export default {
       });
       Swal.showLoading();
 
+      this.entry.picture = await uploadImage( this.file );
       if ( this.entry.id ){
         await this.updateEntry( this.entry );
       } else {
@@ -123,6 +132,7 @@ export default {
         this.$router.push({ name: 'entry', params: { id } });
       }
 
+      this.file = null;
       Swal.fire('Guardado', 'Entrada registrada con éxito', 'success');
 
     },
