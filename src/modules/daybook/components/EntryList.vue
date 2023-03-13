@@ -1,19 +1,28 @@
 <template>
 <div class="entry-list-container">
+
   <div class="px-2 pt-2">
     <input type="text"
            class="form-control"
            v-model="term"
            placeholder="Buscar entrada"/>
+  </div>
+
+  <div class="mt-2 d-flex flex-column">
+    <button class="btn btn-primary mx-3"
+            @click="$router.push({name: 'entry', params: { id : 'new' } })">
+      <i class="fas fa-plus-circle"></i>
+      Nueva Entrada
+    </button>
+  </div>
 
     <div class="entry-scrollbar">
       <Entry v-for="entry in entriesByTerm"
              :key="entry.id"
              :entry="entry" >
-
       </Entry>
     </div>
-  </div>
+
 </div>
 </template>
 
