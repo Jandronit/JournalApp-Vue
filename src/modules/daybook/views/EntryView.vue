@@ -43,6 +43,7 @@
 <script>
 import { defineAsyncComponent } from 'vue';
 import { mapGetters, mapActions } from 'vuex';
+import Swal from 'sweetalert2';
 
 import getDayMonthYear from '@/modules/daybook/helpers/getDayMonthYear';
 export default {
@@ -94,16 +95,45 @@ export default {
         this.entry = entry;
     },
     async saveEntry() {
+
+      new Swal({
+        title: 'Espere por favor...',
+        allowOutsideClick: false,
+      });
+      Swal.showLoading();
+
       if ( this.entry.id ){
         await this.updateEntry( this.entry );
       } else {
         const id = await this.createEntry( this.entry );
         this.$router.push({ name: 'entry', params: { id } });
       }
+
+      Swal.fire('Guardado', 'Entrada registrada con éxito', 'success');
+
     },
     async onDeleteEntry() {
-      await this.deleteEntry( this.entry.id );
-      this.$router.push({ name: 'no-entry' });
+
+      const { isConfirmed } = await Swal.fire({
+        title: '¿Estás seguro?',
+        text: "No podrás revertir esta acción",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Sí, estoy seguro',
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        cancelButtonText: 'Cancelar'
+      });
+      if ( isConfirmed ) {
+        new Swal({
+          title: 'Espere por favor...',
+          allowOutsideClick: false,
+        });
+        Swal.showLoading();
+        await this.deleteEntry( this.entry.id );
+        this.$router.push({ name: 'no-entry' });
+        Swal.fire('Eliminado', '', 'success');
+      }
     }
   },
   created() {
