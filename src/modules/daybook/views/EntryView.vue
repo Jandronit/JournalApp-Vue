@@ -11,6 +11,8 @@
   </div>
 
   <div>
+    <input type="file"
+           @change="onSelectedImage">
     <button v-if="entry.id"
             class="btn btn-danger mx-2"
             @click="onDeleteEntry">
@@ -30,9 +32,12 @@
     <textarea v-model="entry.text"  placeholder="¿Qué sucedió ahora"></textarea>
   </div>
 
-  <img src="https://images.pexels.com/photos/2662116/pexels-photo-2662116.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-       alt="entry-picture" class="img-thumbnail">
-
+<!--  <img src="https://images.pexels.com/photos/2662116/pexels-photo-2662116.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"-->
+<!--       alt="entry-picture" class="img-thumbnail">-->
+    <img v-if="localImage"
+         :src="localImage"
+         alt="entry-picture"
+         class="img-thumbnail">
   </template>
 
   <Fab icon="fa-save"
@@ -59,7 +64,9 @@ export default {
   },
   data() {
     return {
-      entry: null
+      entry: null,
+      localImage: null,
+      file: null
     }
   },
   computed: {
@@ -134,6 +141,22 @@ export default {
         this.$router.push({ name: 'no-entry' });
         Swal.fire('Eliminado', '', 'success');
       }
+    },
+    onSelectedImage( event ) {
+      const file = event.target.files[0];
+      if( !file ){
+        this.localImage = null;
+        this.file = null;
+        return;
+      }
+
+      this.file = file;
+
+      const fr = new FileReader();
+      fr.onload = () => this.localImage = fr.result;
+      fr.readAsDataURL( file );
+    },
+    onSelectImage() {
     }
   },
   created() {
