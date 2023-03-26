@@ -27,4 +27,15 @@ describe('Test in router module to Daybook', () => {
         expect(routes).toContain('EntryView')
 
     })
+
+    test('should return the id of the route', async () => {
+        const route = {
+            params: {
+                id: 'ABC-123'
+            }
+        }
+
+        const entryRoute = daybookRouter.children.find(child => child.name === 'entry')
+        expect(entryRoute.props(route)).toEqual({ id: 'ABC-123' })
+    })
 })
