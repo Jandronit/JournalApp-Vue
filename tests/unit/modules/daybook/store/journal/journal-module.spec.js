@@ -24,7 +24,7 @@ describe('Vuex - Test in the Journal Module', () => {
     })
 
     // Mutations
-    test('mutations: setEntries', async () => {
+    test('mutations: setEntries',  () => {
         const store = createVuexStore( {isLoading: true, entries: []} )
 
         store.commit('journal/setEntries', journalState.entries)
@@ -33,7 +33,7 @@ describe('Vuex - Test in the Journal Module', () => {
         expect(store.state.journal.isLoading).toBeFalsy()
 
     })
-    test('mutations: updateEntry', async () => {
+    test('mutations: updateEntry',  () => {
         const store = createVuexStore( journalState )
 
         const updatedEntry = {
@@ -47,5 +47,25 @@ describe('Vuex - Test in the Journal Module', () => {
         const entries = store.state.journal.entries
         expect(entries.length).toBe(2)
         expect(entries).toEqual( expect.arrayContaining([ updatedEntry ]) )
+    })
+    test('mutations: addEntry deleteEntry',  () => {
+        const store = createVuexStore( journalState )
+
+        const newEntry = {
+            id: "-NQRmzEsKr2E6KwDXqW1",
+            date: 1678741597748,
+            text: "Hola mundo 3"
+        }
+        store.commit('journal/addEntry', newEntry)
+
+        const stateEntries = store.state.journal.entries
+
+        expect(stateEntries.length).toBe(3)
+        expect(stateEntries).toEqual( expect.arrayContaining([ newEntry ]) )
+
+        store.commit('journal/deleteEntry', newEntry.id)
+        expect(store.state.journal.entries.length).toBe(2)
+        expect(store.state.journal.entries).toEqual( expect.not.arrayContaining([ newEntry ]) )
+
     })
 })
