@@ -33,4 +33,19 @@ describe('Vuex - Test in the Journal Module', () => {
         expect(store.state.journal.isLoading).toBeFalsy()
 
     })
+    test('mutations: updateEntry', async () => {
+        const store = createVuexStore( journalState )
+
+        const updatedEntry = {
+            id: "-NQR_93QmkLPzTzQPdY0",
+            date: 1678737966001,
+            text: "Hola mundo desde las pruebas"
+        }
+
+        store.commit('journal/updateEntry', updatedEntry)
+
+        const entries = store.state.journal.entries
+        expect(entries.length).toBe(2)
+        expect(entries).toEqual( expect.arrayContaining([ updatedEntry ]) )
+    })
 })
