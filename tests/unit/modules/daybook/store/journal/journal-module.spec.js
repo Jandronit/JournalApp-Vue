@@ -12,7 +12,7 @@ const createVuexStore = ( initialState ) =>  createStore({
     }
 })
 describe('Vuex - Test in the Journal Module', () => {
-    //Basics
+    // Basics
     test('This initial status, should have this state', async () => {
 
         const store = createVuexStore( journalState )
@@ -21,5 +21,16 @@ describe('Vuex - Test in the Journal Module', () => {
 
         expect( isLoading ).toBeFalsy()
         expect( entries ).toEqual( journalState.entries)
+    })
+
+    // Mutations
+    test('mutations: setEntries', async () => {
+        const store = createVuexStore( {isLoading: true, entries: []} )
+
+        store.commit('journal/setEntries', journalState.entries)
+
+        expect(store.state.journal.entries.length ).toBe(2)
+        expect(store.state.journal.isLoading).toBeFalsy()
+
     })
 })
