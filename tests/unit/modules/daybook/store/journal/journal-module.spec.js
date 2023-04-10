@@ -2,7 +2,22 @@
 import { createStore } from 'vuex'
 import journal from '@/modules/daybook/store/journal'
 import { journalState } from '../../../../../mocks/test-journal-state';
+import journalApi from '@/api/journalApi';
 
+//Mock journalApi response data fake firebase
+const transformEntries = ( array ) => {
+    // array tiene una propiedad id que hará de clave
+    const result = array.reduce((map, obj) => {
+        // Copia profunda del objeto
+        const copy = JSON.parse(JSON.stringify(obj))
+        // Retiramos la clave
+        delete copy.id
+        map[obj.id] = copy
+        return map
+    }, {})
+
+    return result
+}
 const createVuexStore = ( initialState ) =>  createStore({
     modules: {
         journal: {
@@ -82,4 +97,26 @@ describe('Vuex - Test in the Journal Module', () => {
         const entry = store.getters['journal/getEntryById'](journalState.entries[0].id)
         expect(entry).toEqual( journalState.entries[0] )
     })
+
+    // Actions
+    test('actions: loadEntries', async () => {
+        // Mock de journalAPI
+        jest.mock("@/api/journalApi");
+
+        // Creamos el store con un estado con entries vacío
+        const store = createVuexStore({
+            isLoading: true,
+            entries: [],
+        });
+
+        // Preparamos la respuesta del mock de journalAPI(Firebase)
+        const data = transformEntries(journalState.entries);
+        journalApi.get = jest.fn()
+        journalApi.get.mockResolvedValueOnce({ data });
+
+        await store.dispatch("journal/loadEntries");
+
+        expect(store.state.journal.entries).toHaveLength(2);
+
+    });
 })
