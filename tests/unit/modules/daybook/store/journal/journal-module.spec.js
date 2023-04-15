@@ -119,4 +119,23 @@ describe('Vuex - Test in the Journal Module', () => {
         expect(store.state.journal.entries).toHaveLength(2);
 
     });
+
+    test('actions: updateEntry', async () => {
+        // Mock de journalAPI
+        jest.mock("@/api/journalApi");
+        const store = createVuexStore(journalState);
+
+        // Preparamos la respuesta del mock de journalAPI(Firebase)
+        const updatedEntry = {
+            id: "-NQR_93QmkLPzTzQPdY0",
+            date: 1678737966001,
+            text: "Hola mundo desde las pruebas 2"
+        }
+        journalApi.put = jest.fn()
+        journalApi.put.mockResolvedValueOnce(updatedEntry);
+
+
+        await store.dispatch("journal/updateEntry", updatedEntry);
+        expect(store.state.journal.entries).toEqual( expect.arrayContaining([ updatedEntry ]) )
+    });
 })
