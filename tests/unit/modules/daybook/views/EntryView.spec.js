@@ -1,5 +1,6 @@
 import { shallowMount } from "@vue/test-utils";
 import { createStore } from "vuex";
+import Swal from "sweetalert2";
 
 import journal from "@/modules/daybook/store/journal";
 import EntryView from "@/modules/daybook/views/EntryView.vue";
@@ -15,6 +16,12 @@ const createVuexStore = (initialState) =>
       },
     },
   });
+
+jest.mock("sweetalert2", () => ({
+  fire: jest.fn(),
+  showLoading: jest.fn(),
+  close: jest.fn(),
+}));
 describe("Test in component EntryView", () => {
   const store = createVuexStore(journalState);
   const mockRouter = {
@@ -56,5 +63,22 @@ describe("Test in component EntryView", () => {
   test("You must show the entry", () => {
     expect(wrapper.html()).toMatchSnapshot();
     expect(mockRouter.push).not.toHaveBeenCalled();
+  });
+
+  test("You must delete the entry", () => {
+    Swal.fire.mockReturnValueOnce({ isConfirmed: true });
+
+    wrapper.find(".btn-danger").trigger("click");
+
+    expect(Swal.fire).toHaveBeenCalledWith({
+      title: "¿Estás seguro?",
+      text: "No podrás revertir esta acción",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, estoy seguro",
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      cancelButtonText: "Cancelar",
+    });
   });
 });
