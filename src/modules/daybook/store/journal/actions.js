@@ -24,7 +24,7 @@ export const updateEntry = async ({ commit }, entry) => {
     const { date, picture, text } = entry
     const dataToSave = { date, picture, text }
 
-    const resp = await journalApi.put(`/entries/${ entry.id }.json`, dataToSave)
+    await journalApi.put(`/entries/${ entry.id }.json`, dataToSave)
 
     dataToSave.id = entry.id
     commit('updateEntry', { ...dataToSave })
@@ -41,7 +41,7 @@ export const createEntry = async ({ commit }, entry) => {
 }
 
 export const deleteEntry = async ({ commit }, id) => {
-    const resp = await journalApi.delete(`/entries/${ id }.json`)
+    await journalApi.delete(`/entries/${ id }.json`);
     commit('deleteEntry', id)
     return id
 }
