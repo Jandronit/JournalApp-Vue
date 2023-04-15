@@ -98,44 +98,81 @@ describe('Vuex - Test in the Journal Module', () => {
         expect(entry).toEqual( journalState.entries[0] )
     })
 
-    // Actions
-    test('actions: loadEntries', async () => {
+    // Actions with mock of journalApi
+    describe('actions: mock of response(Firebase)', () => {
         // Mock de journalAPI
         jest.mock("@/api/journalApi");
 
-        // Creamos el store con un estado con entries vacío
-        const store = createVuexStore({
-            isLoading: true,
-            entries: [],
+        test('actions: loadEntries', async () => {
+            // Creamos el store con un estado con entries vacío
+            const store = createVuexStore({
+                isLoading: true,
+                entries: [],
+            });
+
+            // Preparamos la respuesta del mock de journalAPI(Firebase)
+            const data = transformEntries(journalState.entries);
+            journalApi.get = jest.fn()
+            journalApi.get.mockResolvedValueOnce({data});
+
+            await store.dispatch("journal/loadEntries");
+
+            expect(store.state.journal.entries).toHaveLength(2);
+
         });
 
-        // Preparamos la respuesta del mock de journalAPI(Firebase)
-        const data = transformEntries(journalState.entries);
-        journalApi.get = jest.fn()
-        journalApi.get.mockResolvedValueOnce({ data });
+        test('actions: updateEntry', async () => {
+            const store = createVuexStore(journalState);
 
-        await store.dispatch("journal/loadEntries");
 
-        expect(store.state.journal.entries).toHaveLength(2);
+            const updatedEntry = {
+                id: "-NQR_93QmkLPzTzQPdY0",
+                date: 1678737966001,
+                text: "Hola mundo desde las pruebas 2"
+            }
+            // Preparamos la respuesta del mock de journalAPI(Firebase)
+            journalApi.put = jest.fn()
+            journalApi.put.mockResolvedValueOnce();
+
+
+            await store.dispatch("journal/updateEntry", updatedEntry);
+            expect(store.state.journal.entries).toEqual(expect.arrayContaining([updatedEntry]))
+        });
+
+        test('actions: createEntry, deleteEntry', async () => {
+            const store = createVuexStore(journalState);
+
+            const newEntry = {
+                id: "-NQRmzEsKr2E6KwDXqW1",
+                date: 1678741597748,
+                text: "Hola mundo 3"
+            }
+
+            // Preparamos la respuesta del mock de journalAPI(Firebase)
+            const respFirebase = {
+                name: "-NQRmzEsKr2E6KwDXqW1",
+                date: 1678741597748,
+                text: "Hola mundo 3"
+            }
+            journalApi.post = jest.fn()
+            journalApi.post.mockResolvedValueOnce({data: respFirebase});
+
+            const id = await store.dispatch("journal/createEntry", newEntry);
+
+            expect(id).toString()
+            expect(store.state.journal.entries.find(e => e.id === id)).toBeTruthy();
+            expect(store.state.journal.entries).toHaveLength(3);
+            expect(store.state.journal.entries).toEqual(expect.arrayContaining([newEntry]))
+
+            // Preparamos la respuesta del mock de journalAPI(Firebase)
+            journalApi.delete = jest.fn()
+            journalApi.delete.mockResolvedValueOnce();
+
+            await store.dispatch("journal/deleteEntry", newEntry.id);
+            expect(store.state.journal.entries).toHaveLength(2);
+            expect(store.state.journal.entries).toEqual(expect.not.arrayContaining([newEntry]))
+        });
 
     });
 
-    test('actions: updateEntry', async () => {
-        // Mock de journalAPI
-        jest.mock("@/api/journalApi");
-        const store = createVuexStore(journalState);
-
-        // Preparamos la respuesta del mock de journalAPI(Firebase)
-        const updatedEntry = {
-            id: "-NQR_93QmkLPzTzQPdY0",
-            date: 1678737966001,
-            text: "Hola mundo desde las pruebas 2"
-        }
-        journalApi.put = jest.fn()
-        journalApi.put.mockResolvedValueOnce(updatedEntry);
-
-
-        await store.dispatch("journal/updateEntry", updatedEntry);
-        expect(store.state.journal.entries).toEqual( expect.arrayContaining([ updatedEntry ]) )
-    });
 })
