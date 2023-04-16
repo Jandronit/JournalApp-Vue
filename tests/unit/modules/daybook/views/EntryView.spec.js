@@ -24,6 +24,8 @@ jest.mock("sweetalert2", () => ({
 }));
 describe("Test in component EntryView", () => {
   const store = createVuexStore(journalState);
+  store.dispatch = jest.fn();
+
   const mockRouter = {
     push: jest.fn(),
   };
@@ -65,7 +67,7 @@ describe("Test in component EntryView", () => {
     expect(mockRouter.push).not.toHaveBeenCalled();
   });
 
-  test("You must delete the entry", () => {
+  test("You must delete the entry", (done) => {
     Swal.fire.mockReturnValueOnce({ isConfirmed: true });
 
     wrapper.find(".btn-danger").trigger("click");
@@ -80,5 +82,13 @@ describe("Test in component EntryView", () => {
       cancelButtonColor: "#d33",
       cancelButtonText: "Cancelar",
     });
+
+    setTimeout(() => {
+      expect(store.dispatch).toHaveBeenCalledWith(
+        "journal/deleteEntry",
+        "-NQR_93QmkLPzTzQPdY0"
+      );
+      done();
+    }, 1);
   });
 });
