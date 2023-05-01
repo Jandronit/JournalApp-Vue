@@ -56,6 +56,7 @@ export default defineComponent({
         class="input100"
         type="password"
         placeholder="Password"
+        autocomplete="off"
         required
       />
       <span class="focus-input100" data-placeholder="&#xe80f;"></span>
