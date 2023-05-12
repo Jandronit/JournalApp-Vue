@@ -15,7 +15,8 @@ export default defineComponent({
       userForm,
 
       onSubmit: async () => {
-        createUser(userForm.value);
+        const { ok, message } = await createUser(userForm.value);
+        console.log(ok, message);
       },
     };
   },
@@ -45,6 +46,7 @@ export default defineComponent({
         class="input100"
         type="email"
         placeholder="Email"
+        autocomplete="username"
         required
       />
       <span class="focus-input100" data-placeholder="&#xe818;"></span>
@@ -56,7 +58,7 @@ export default defineComponent({
         class="input100"
         type="password"
         placeholder="Password"
-        autocomplete="off"
+        autocomplete="current-password"
         required
       />
       <span class="focus-input100" data-placeholder="&#xe80f;"></span>
