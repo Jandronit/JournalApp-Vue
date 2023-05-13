@@ -8,7 +8,13 @@ export const createUser = async ({ commit }, user) => {
       password,
       returnSecureToken: true,
     });
-    // TODO: Mutation: loginUser
+    const { idToken, refreshToken } = data;
+
+    const response = await authApi.post(":update", {
+      displayName: name,
+      idToken,
+    });
+    console.log(response);
     return { ok: true, message: "User created" };
   } catch (error) {
     return { ok: false, message: error.response.data.error.message };
