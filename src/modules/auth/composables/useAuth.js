@@ -12,10 +12,15 @@ const useAuth = () => {
     const response = await store.dispatch("auth/signInUser", user);
     return response;
   };
+  const checkAuthentication = async () => {
+    const response = await store.dispatch("auth/checkAuthentication");
+    return response;
+  };
 
   return {
     createUser,
     signInUser,
+    checkAuthentication,
   };
 };
 export default useAuth;
