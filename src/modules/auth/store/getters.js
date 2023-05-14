@@ -1,5 +1,3 @@
-
-
-// export const myGetter = ( state ) => {
-//   return state.myState
-// }
+export const currentState = (state) => {
+  return state.status;
+};

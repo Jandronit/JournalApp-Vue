@@ -1,5 +1,6 @@
 import { useStore } from "vuex";
 import { signInUser } from "@/modules/auth/store/actions";
+import { computed } from "vue";
 
 const useAuth = () => {
   const store = useStore();
@@ -21,6 +22,8 @@ const useAuth = () => {
     createUser,
     signInUser,
     checkAuthentication,
+
+    authStatus: computed(() => store.getters["auth/authStatus"]),
   };
 };
 export default useAuth;
