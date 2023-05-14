@@ -29,6 +29,10 @@ const routes = [
     path: "/auth",
     ...authRouter,
   },
+  {
+    path: "/:pathMatch(.*)*",
+    redirect: { name: "home" },
+  },
 ];
 
 const router = createRouter({
