@@ -59,7 +59,7 @@ export const checkAuthentication = async ({ commit }) => {
 
     commit("loginUser", { user, idToken, refreshToken });
 
-    return { ok: true, message: "User logged" };
+    return { ok: true };
   } catch (error) {
     commit("logoutUser");
     return { ok: false, message: error.response.data.error.message };
