@@ -1,5 +1,6 @@
 import initialStateFake from "../../../../mocks/auth-initialState";
 import createVuexStore from "../../../../mocks/mock-store";
+import authApi from "@/api/authApi";
 
 describe("Vuex - Test in the Auth Module", () => {
   test("initial state", () => {
@@ -69,4 +70,30 @@ describe("Vuex - Test in the Auth Module", () => {
   });
 
   // Actions
+  test("Actions: createUser - Error user exist", async () => {
+    const store = createVuexStore(initialStateFake);
+    const newUser = {
+      name: "test",
+      email: "test@test.es",
+      password: "123456",
+    };
+
+    // Preparamos la respuesta del mock de authApi(Firebase)
+    const dataFailFake = {
+      data: {
+        error: {
+          message: "EMAIL_EXISTS",
+        },
+      },
+    };
+
+    // Simulamos la llamada y respuesta del mock de authApi(Firebase)
+    authApi.post = jest.fn();
+    authApi.post.mockReturnValueOnce(
+      Promise.reject({ response: dataFailFake })
+    );
+
+    const resp = await store.dispatch("auth/createUser", newUser);
+    expect(resp).toEqual({ ok: false, message: "EMAIL_EXISTS" });
+  });
 });
