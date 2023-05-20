@@ -70,7 +70,7 @@ describe("Vuex - Test in the Auth Module", () => {
   });
 
   // Actions
-  test("Actions: createUser - Error user exist", async () => {
+  test("Actions: createUser - Error user already exists", async () => {
     const store = createVuexStore(initialStateFake);
     const newUser = {
       name: "test",
@@ -95,5 +95,43 @@ describe("Vuex - Test in the Auth Module", () => {
 
     const resp = await store.dispatch("auth/createUser", newUser);
     expect(resp).toEqual({ ok: false, message: "EMAIL_EXISTS" });
+
+    const { status, user, idToken, refreshToken } = store.state.auth;
+
+    expect(status).toBe("authenticating");
+    expect(user).toBe(null);
+    expect(idToken).toBe(null);
+    expect(refreshToken).toBe(null);
+  });
+
+  test("Actions: createUser - signInUser", async () => {
+    const store = createVuexStore(initialStateFake);
+    const newUser = {
+      name: "test",
+      email: "test@test.es",
+      password: "123456",
+    };
+    // Preparamos la respuesta del mock de authApi(Firebase)
+    const dataSuccessFake = {
+      idToken: "ABC-123",
+      refreshToken: "XYZ-123",
+    };
+
+    // Simulamos la llamada y respuesta del mock de authApi(Firebase)
+    authApi.post = jest.fn();
+    authApi.post.mockReturnValueOnce(
+      Promise.resolve({ data: dataSuccessFake })
+    );
+
+    const resp = await store.dispatch("auth/createUser", newUser);
+
+    expect(resp).toEqual({ ok: true, message: "User created" });
+
+    const { status, user, idToken, refreshToken } = store.state.auth;
+
+    expect(status).toBe("authenticated");
+    expect(user).toEqual({ name: newUser.name, email: newUser.email });
+    expect(idToken).toBe(dataSuccessFake.idToken);
+    expect(refreshToken).toBe(dataSuccessFake.refreshToken);
   });
 });
