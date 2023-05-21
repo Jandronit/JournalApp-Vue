@@ -31,4 +31,45 @@ describe("Test in useAuth", () => {
     expect(mockStore.dispatch).toHaveBeenCalledWith("auth/createUser", newUser);
     expect(resp).toEqual({ ok: false, message: "EMAIL_EXISTS" });
   });
+
+  test("signInUser success", async () => {
+    const { signInUser } = useAuth();
+    const loginForm = { email: "test@test.es", password: "123456" };
+    mockStore.dispatch.mockReturnValue({ ok: true });
+
+    const resp = await signInUser(loginForm);
+    expect(mockStore.dispatch).toHaveBeenCalledWith(
+      "auth/signInUser",
+      loginForm
+    );
+    expect(resp).toEqual({ ok: true });
+  });
+
+  test("signInUser error", async () => {
+    const { signInUser } = useAuth();
+    const loginForm = { email: "test@test.es", password: "123456" };
+    mockStore.dispatch.mockReturnValue({
+      ok: false,
+      message: "EMAIL_NOT_FOUND",
+    });
+
+    const resp = await signInUser(loginForm);
+    expect(mockStore.dispatch).toHaveBeenCalledWith(
+      "auth/signInUser",
+      loginForm
+    );
+    expect(resp).toEqual({
+      ok: false,
+      message: "EMAIL_NOT_FOUND",
+    });
+  });
+
+  test("authStatus", async () => {
+    const { authStatus } = useAuth();
+    mockStore.dispatch.mockReturnValue({ ok: true });
+
+    const resp = await authStatus();
+    expect(mockStore.dispatch).toHaveBeenCalledWith("auth/checkAuthentication");
+    expect(resp).toEqual({ ok: true });
+  });
 });
