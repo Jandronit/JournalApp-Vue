@@ -183,4 +183,32 @@ describe("Vuex - Test in the Auth Module", () => {
     });
     expect(token).toBe(dataSuccessFake.idToken);
   });
+
+  test("Actions:  checkAuthentication - Negative", async () => {
+    const store = createVuexStore(initialStateFake);
+
+    localStorage.removeItem("idToken");
+    const checkResp = await store.dispatch("auth/checkAuthentication");
+    expect(checkResp).toEqual({ ok: false, message: "No token" });
+    expect(store.state.auth.status).toBe("not-authenticated");
+
+    // Preparamos la respuesta del mock de authApi(Firebase)
+    const dataFailFake = {
+      data: {
+        error: {
+          message: "INVALID_ID_TOKEN",
+        },
+      },
+    };
+
+    // Simulamos la llamada y respuesta del mock de authApi(Firebase)
+    authApi.post = jest.fn();
+    authApi.post.mockReturnValueOnce(
+      Promise.reject({ response: dataFailFake })
+    );
+
+    localStorage.setItem("idToken", "ABC-123");
+    const checkResp2 = await store.dispatch("auth/checkAuthentication");
+    expect(checkResp2).toEqual({ ok: false, message: "INVALID_ID_TOKEN" });
+  });
 });
