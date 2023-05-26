@@ -1,10 +1,15 @@
 import { shallowMount } from "@vue/test-utils";
 import Navbar from "@/modules/daybook/components/Navbar.vue";
+import { useRouter } from "vue-router";
+
 import createVuexStore from "../../../../mocks/mock-store";
 
 const mockRouter = {
   push: jest.fn(),
 };
+jest.mock("vue-router", () => ({
+  useRouter: jest.fn(),
+}));
 describe("Tests Navbar Component", () => {
   const store = createVuexStore({
     user: {
@@ -20,6 +25,9 @@ describe("Tests Navbar Component", () => {
     const wrapper = shallowMount(Navbar, {
       global: {
         plugins: [store],
+        mocks: {
+          $router: useRouter(),
+        },
       },
     });
 
